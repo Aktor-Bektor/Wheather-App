@@ -6,6 +6,6 @@ include(${wxWidgets_USE_FILE})
 
 find_package(CURL REQUIRED)
 
-add_executable(Random main.cpp)
+add_executable(Random src/main.cpp)
 
 target_link_libraries(Random ${wxWidgets_LIBRARIES} ${CURL_LIBRARIES})
