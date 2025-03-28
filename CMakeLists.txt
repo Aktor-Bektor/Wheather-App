@@ -5,7 +5,7 @@ find_package(wxWidgets REQUIRED COMPONENTS core base)
 include(${wxWidgets_USE_FILE})
 
 find_package(CURL REQUIRED)
+find_package(nlohmann_json)
 
 add_executable(Random src/main.cpp)
-
 target_link_libraries(Random ${wxWidgets_LIBRARIES} ${CURL_LIBRARIES})
