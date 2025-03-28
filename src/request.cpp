@@ -111,7 +111,7 @@ namespace request
         return data;
     }
 
-    std::vector <WheatherData> forecast(std::string city, short days)
+    std::vector <WheatherData> get_forecast(std::string city, short days)
     {
         std::vector<WheatherData> data;
 

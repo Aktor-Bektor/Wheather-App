@@ -24,7 +24,7 @@ class Frame : public wxFrame
 
     private:
         wxListView * basicListView;
-        void populateListView();
+        void populateListView(std::string city = "", short days = 0);
 };
 
 //Initialization Things
@@ -41,14 +41,55 @@ Frame::Frame(const wxString &title, const wxPoint &pos, const wxSize &size) : wx
     //Panel Declaration
     wxPanel * panel = new wxPanel(this);
 
+    basicListView = new wxListView(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_SINGLE_SEL);
+
+    std::cout << "Enter City: ";
+    std::string city;
+    std::cin >> city;
+    if(typeid(city) != typeid(std::string) || city.empty())
+    {
+        throw std::invalid_argument("City must be a string");
+    }
+    std::cout << "Enter Days (0 for current data): ";
+    short days;
+    std::cin >> days;
+    if(typeid(days) != typeid(short) || days < 0 || days > 14)
+    {
+        throw std::invalid_argument("Days must be a number between 0 and 14");
+    }
+
     //ListView Declaration
-    basicListView = new wxListView(panel);
-    basicListView -> AppendColumn("ID");
-    basicListView -> AppendColumn("Name");
-    basicListView -> AppendColumn("Description");
+    wxListItem column;
+    column.SetAlign(wxLIST_FORMAT_CENTER);
+
+    column.SetText("Day");
+    basicListView->InsertColumn(0, column);
+
+    column.SetText("Condition");
+    basicListView->InsertColumn(1, column);
+
+    column.SetText("Temperature");
+    basicListView->InsertColumn(2, column);
+
+    column.SetText("Wind Speed");
+    basicListView->InsertColumn(3, column);
+
+    column.SetText("Humidity");
+    basicListView->InsertColumn(4, column);
+
+    column.SetText("Precipitation");
+    basicListView->InsertColumn(5, column);
+
+    column.SetText("Feels Like");
+    basicListView->InsertColumn(6, column);
+
     basicListView -> SetColumnWidth(0, 80);
-    basicListView -> SetColumnWidth(1, 120);
-    basicListView -> SetColumnWidth(2, 600);
+    basicListView -> SetColumnWidth(1, 200);
+    basicListView -> SetColumnWidth(2, 100);
+    basicListView -> SetColumnWidth(3, 100);
+    basicListView -> SetColumnWidth(4, 100);
+    basicListView -> SetColumnWidth(5, 100);
+    basicListView -> SetColumnWidth(6, 100);
 
     //Button Declaration
 
@@ -60,22 +101,54 @@ Frame::Frame(const wxString &title, const wxPoint &pos, const wxSize &size) : wx
     panel -> SetSizerAndFit(sizer);
 
     //Event Handling
-    populateListView();
+    populateListView(city, days);
 }
 
-void Frame::populateListView()
+void Frame::populateListView(std::string city, short days)
 {
-    basicListView -> InsertItem(0, "1");
-    basicListView -> SetItem(0, 1, "Item 1");
-    basicListView -> SetItem(0, 2, "This is an item");
+    if(days == 0)
+    {
+        request::WheatherData data = request::get_current(city);
 
-    basicListView -> InsertItem(1, "2");
-    basicListView -> SetItem(1, 1, "Item 2");
-    basicListView -> SetItem(1, 2, "This is another item");
+        basicListView -> InsertItem(0, wxString::FromUTF8("Current"));
+        basicListView -> SetItem(0, 1, data.condition);
 
-    basicListView -> InsertItem(2, "3");
-    basicListView -> SetItem(2, 1, "Item 3");
-    basicListView -> SetItem(2, 2, "This is yet another item");
+        std::stringstream tempStream, windStream, humidityStream, precipStream, feelsLikeStream;
+        tempStream << std::fixed << std::setprecision(2) << data.temp;
+        windStream << std::fixed << std::setprecision(2) << data.wind;
+        humidityStream << std::fixed << std::setprecision(2) << data.humidity;
+        precipStream << std::fixed << std::setprecision(2) << data.precipitation;
+        feelsLikeStream << std::fixed << std::setprecision(2) << data.feels_like;
+
+        basicListView->SetItem(0, 2, wxString::FromUTF8(tempStream.str()));
+        basicListView->SetItem(0, 3, wxString::FromUTF8(windStream.str()));
+        basicListView->SetItem(0, 4, wxString::FromUTF8(humidityStream.str()));
+        basicListView->SetItem(0, 5, wxString::FromUTF8(precipStream.str()));
+        basicListView->SetItem(0, 6, wxString::FromUTF8(feelsLikeStream.str()));
+    }
+    else
+    {
+        std::vector<request::WheatherData> data = request::get_forecast(city, days);
+        for(size_t i = 0; i < data.size(); ++i)
+        {
+            basicListView -> InsertItem(i, wxString::FromUTF8(std::to_string(i + 1)));
+            basicListView -> SetItem(i, 1, data[i].condition);
+            
+            std::stringstream tempStream, windStream, humidityStream, precipStream, feelsLikeStream;
+            tempStream << std::fixed << std::setprecision(2) << data[i].temp;
+            windStream << std::fixed << std::setprecision(2) << data[i].wind;
+            humidityStream << std::fixed << std::setprecision(2) << data[i].humidity;
+            precipStream << std::fixed << std::setprecision(2) << data[i].precipitation;
+            feelsLikeStream << std::fixed << std::setprecision(2) << data[i].feels_like;
+
+            basicListView->SetItem(i, 2, wxString::FromUTF8(tempStream.str()));
+            basicListView->SetItem(i, 3, wxString::FromUTF8(windStream.str()));
+            basicListView->SetItem(i, 4, wxString::FromUTF8(humidityStream.str()));
+            basicListView->SetItem(i, 5, wxString::FromUTF8(precipStream.str()));
+            basicListView->SetItem(i, 6, wxString::FromUTF8(feelsLikeStream.str()));
+        }
+    }
+    
 }
 
 //Main Function
