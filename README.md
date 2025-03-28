@@ -1,9 +1,4 @@
-
-<<<<<<< HEAD
-# Wheather App
-=======
 # Whether App
->>>>>>> 4c9ede2 (Idk what happend with the last attempt)
 
 Basic C++ wheather app made as a project by me because i don't have anything else to do.
 
