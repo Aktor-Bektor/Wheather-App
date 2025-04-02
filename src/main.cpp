@@ -1,13 +1,9 @@
-#include <stdexcept>
-#include <iostream>
-#include <sstream>
+#include <fstream>
 #include <wx-3.2/wx/wx.h>
 #include <wx-3.2/wx/listctrl.h>
-#include <curl/curl.h>
-#include <nlohmann/json.hpp>
-#include <stdlib.h>
-#include <cstring>
 #include "request.cpp"
+
+
 
 //App Class
 class App : public wxApp 

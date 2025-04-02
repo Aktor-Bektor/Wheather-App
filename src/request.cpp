@@ -1,14 +1,26 @@
-#include <sstream>
-#include <curl/curl.h>
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <cstring>
+#include <cmath>
 #include <stdexcept>
 #include <stdlib.h>
-#include <cstring>
+#include <curl/curl.h>
 #include <nlohmann/json.hpp>
-#include <cmath>
 
 namespace request
 {
+    std::string APIkey = []() {
+        std::ifstream API("../APIkey.txt");
+        if(!API.is_open())
+            throw std::runtime_error("Failed to open APIkey.txt");
+
+        std::string APIkey;
+        std::getline(API, APIkey);
+        API.close();
+        return APIkey;
+    }();
+
     struct WheatherData
     {
         std::string location;
@@ -53,9 +65,11 @@ namespace request
         WheatherData data;
 
         std::stringstream adress;
-        adress << "http://api.weatherapi.com/v1/current.json?key=53be16e6eef04200abc175333252703&q=" 
+        adress << "http://api.weatherapi.com/v1/current.json?key=" 
+            << APIkey
+            << "&q=" 
             << city 
-            << "&appid=8";
+            << "&aqi=no";
         
         CURL *curl;
         CURLcode result;
@@ -116,7 +130,9 @@ namespace request
         std::vector<WheatherData> data;
 
         std::stringstream adress;
-        adress << "http://api.weatherapi.com/v1/forecast.json?key=53be16e6eef04200abc175333252703&q=" 
+        adress << "http://api.weatherapi.com/v1/forecast.json?key="
+            << APIkey
+            << "&q=" 
             << city 
             << "&days=" 
             << days 
