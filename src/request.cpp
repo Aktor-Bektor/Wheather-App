@@ -2,14 +2,18 @@
 #include <fstream>
 #include <sstream>
 #include <cstring>
-#include <cmath>
+
+#include <algorithm>
+
 #include <stdexcept>
 #include <stdlib.h>
+
 #include <curl/curl.h>
 #include <nlohmann/json.hpp>
 
-namespace request
-{
+#include "request.h"
+
+namespace request {
     std::string APIkey = []() {
         std::ifstream API("../APIkey.txt");
         if(!API.is_open())
@@ -20,23 +24,6 @@ namespace request
         API.close();
         return APIkey;
     }();
-
-    struct WheatherData
-    {
-        std::string location;
-        std::string condition;
-        float temp;
-        float wind;
-        float humidity;
-        float precipitation;
-        float feels_like;
-    };
-
-    struct Response
-    {
-        char* string;
-        size_t size;
-    };
 
     size_t write_chunck(void *data, size_t size, size_t nmemb, std::string *userdata)
     {
@@ -62,6 +49,12 @@ namespace request
 
     WheatherData get_current(std::string city)
     {
+        size_t pos = 0;
+        while ((pos = city.find(' ', pos)) != std::string::npos) {
+            city.replace(pos, 1, "%20");
+            pos += 3;
+        }
+
         WheatherData data;
 
         std::stringstream adress;
@@ -127,6 +120,12 @@ namespace request
 
     std::vector <WheatherData> get_forecast(std::string city, short days)
     {
+        size_t pos = 0;
+        while ((pos = city.find(' ', pos)) != std::string::npos) {
+            city.replace(pos, 1, "%20");
+            pos += 3;
+        }
+
         std::vector<WheatherData> data;
 
         std::stringstream adress;
