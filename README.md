@@ -19,6 +19,7 @@ This project is used by the following companies:
 
 - wxWidgets C++ library
 - curl C++ library
+- nlohmann C++ library
 - C++ compiler (duh)
 ## Features
 
